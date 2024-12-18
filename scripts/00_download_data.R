@@ -1,6 +1,7 @@
 # Data Sources
 covid_vax_adults_src <- "https://raw.githubusercontent.com/nychealth/covid-vaccine-data/refs/heads/main/people/coverage-by-modzcta-adults.csv"
 covid_total_modzcta_src <- "https://raw.githubusercontent.com/nychealth/coronavirus-data/refs/heads/master/totals/data-by-modzcta.csv"
+modzcta_shape_topo_src <- "https://raw.githubusercontent.com/nychealth/coronavirus-data/refs/heads/master/Geography-resources/MODZCTA_2010_WGS1984.topo.json"
 nyc_election_districts_src <- "https://s-media.nyc.gov/agencies/dcp/assets/files/zip/data-tools/bytes/nyed_24d.zip"
 nyc_election_results_by_year <- "https://raw.githubusercontent.com/toddwschneider/nyc-presidential-election-map/refs/heads/main/nyc_election_results_by_district.csv"
 
@@ -22,12 +23,13 @@ download_data <- function(url, destination) {
   
   # If the file is a zip file, unzip it
   if (endsWith(dest, ".zip")) {
-    unzip(dest, exdir = raw_data_dir)
+    unzip(dest, exdir = destination)
     file.remove(dest)
   }
 }
 
 download_data(covid_vax_adults_src, raw_data_dir)
 download_data(covid_total_modzcta_src, raw_data_dir)
+download_data(modzcta_shape_topo_src, raw_data_dir)
 download_data(nyc_election_districts_src, raw_data_dir)
 download_data(nyc_election_results_by_year, raw_data_dir)
