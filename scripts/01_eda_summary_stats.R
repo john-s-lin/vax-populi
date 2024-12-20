@@ -5,12 +5,16 @@ library(mapview)
 library(webshot2)
 library(ggplot2)
 
-raw_data_dir <- file.path(getwd(), "data/raw")
+raw_data_dir <- file.path(getwd(), "data", "raw")
 output_dir <- file.path(getwd(), "out", "eda")
-
+clean_data_dir <- file.path(getwd(), "data", "clean")
 
 if (!file.exists(output_dir)) {
   dir.create(output_dir, mode = "0755", recursive = TRUE)
+}
+
+if (!file.exists(clean_data_dir)) {
+  dir.create(clean_data_dir, mode = "0755", recursive = TRUE)
 }
 
 # Transform to lat-lon for visualization
@@ -61,7 +65,11 @@ nyed_gg <- ggplot(data = ny_electoral_districts) +
   labs(title = "NY Electoral Districts") +
   theme_light() +
   theme(legend.position = "none")
-ggsave(file.path(output_dir, "nyed_gg.png"), plot = nyed_gg)
+nyed_gg_map <- file.path(output_dir, "nyed_gg.png")
+if (!file.exists(nyed_gg_map)) {
+  ggsave(nyed_gg_map, plot = nyed_gg)
+}
+
 
 modzcta_gg <- ggplot(data = ny_modzcta) +
   geom_sf(aes(fill = "MODZCTA"), alpha = 0.5, color = "red") +
@@ -69,6 +77,80 @@ modzcta_gg <- ggplot(data = ny_modzcta) +
   labs(title = "NY MODZCTA") +
   theme_light() +
   theme(legend.position = "none")
-ggsave(file.path(output_dir, "modzcta_gg.png"), plot = modzcta_gg)
+mz_gg_map <- file.path(output_dir, "modzcta_gg.png")
+if (!file.exists(mz_gg_map)) {
+  ggsave(mz_gg_map, plot = modzcta_gg)
+}
 
-# Join the two maps with `st_union` and see if it works!
+# First check if geometries are valid, if not, then make valid
+if (!all(st_is_valid(ny_electoral_districts))) {
+  ny_electoral_districts <- ny_electoral_districts %>%
+    st_make_valid() %>%
+    st_buffer(0) %>%  # Remove self-intersections
+    st_make_valid()   # Clean up again after buffering
+  print("Made valid ny_electoral_districts")
+}
+
+if (!all(st_is_valid(ny_modzcta))) {
+  ny_modzcta <- ny_modzcta %>%
+    st_make_valid() %>%
+    st_buffer(0) %>%
+    st_make_valid()
+  print("Made valid ny_modzcta")
+}
+
+# Join the two maps with `st_join` and see if it works!
+# This takes a long time, so only do this if the merged_map is not created yet
+merged_map <- file.path(output_dir, "merged_gg.png")
+if (!file.exists(merged_map)) {
+  merged_geo <- st_join(
+    ny_modzcta,
+    ny_electoral_districts,
+    join = st_covers,
+    left = TRUE,
+    largest = TRUE
+  )
+  merged_gg <- ggplot(data = merged_geo) +
+    geom_sf(aes(fill = "Merged"),
+            alpha = 0.5,
+            color = "darkgreen") +
+    scale_fill_manual(values = "green") +
+    theme_light() +
+    theme(legend.position = "none")
+  ggsave(filename = merged_map, plot = merged_gg)
+}
+
+# Looks like they can be merged!
+# Let's join the modzcta tables with the modzcta geometry, cache it.
+# Then join the electoral results with the electoral districts geometry, cache that.
+# Then join them into a large table and cache that as well, since it takes a long
+# time to compute, and we only want to do this once.
+
+# Join the COVID data first by MODZCTA
+covid_vax_data <- read.csv(file.path(raw_data_dir, "coverage-by-modzcta-adults.csv"),
+                           header = TRUE)
+covid_data <- read.csv(file.path(raw_data_dir, "data-by-modzcta.csv"), header = TRUE)
+covid_data_merged <- merge(x = covid_vax_data,
+                           y = covid_data,
+                           by.x = "MODZCTA",
+                           by.y = "MODIFIED_ZCTA")
+# Drop duplicate columns and rename _.x
+covid_data_merged = select(
+  covid_data_merged,-c("NEIGHBORHOOD_NAME.y", "BOROUGH_GROUP", "label", "lat", "lon")
+)
+names(covid_data_merged)[names(covid_data_merged) == "NEIGHBORHOOD_NAME.x"] <- "NEIGHBORHOOD_NAME"
+write.csv(
+  covid_data_merged,
+  file = file.path(clean_data_dir, "covid_data_merged_no_geo.csv"),
+  sep = ",",
+  row.names = FALSE
+)
+
+# Merge by MODZCTA with the geometry, then cache as a shapefile
+covid_merged_geo <- merge(covid_data_merged, ny_modzcta, by = "MODZCTA") %>%
+  select(-c("id"))
+st_write(
+  covid_merged_geo,
+  dsn = file.path(clean_data_dir, "covid_data_merged_geo.geo.json"),
+  driver = "GeoJSON"
+)
