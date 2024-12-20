@@ -148,8 +148,40 @@ write.csv(
 # Merge by MODZCTA with the geometry, then cache as a shapefile
 covid_merged_geo <- merge(covid_data_merged, ny_modzcta, by = "MODZCTA") %>%
   select(-c("id", "label"))
-st_write(
-  covid_merged_geo,
-  dsn = file.path(clean_data_dir, "covid_data_merged_geo.shp"),
-  driver = "ESRI Shapefile"
-)
+cached_covid_merged_geo <- file.path(clean_data_dir, "covid_data_merged_geo.gpkg")
+if (!file.exists(cached_covid_merged_geo)) {
+  st_write(covid_merged_geo, dsn = cached_covid_merged_geo, driver = "GPKG")
+} else {
+  covid_merged_geo <- st_read(cached_nyed_geo, geometry_column = "geom")
+}
+
+# Same thing with electoral data, merge by electoral district
+ny_electoral_results <- read.csv(file.path(raw_data_dir, "nyc_election_results_by_district.csv"),
+                                 header = TRUE)
+nyed_geo <- merge(ny_electoral_results,
+                  ny_electoral_districts,
+                  by.x = "elect_dist",
+                  by.y = "ElectDist") %>%
+  select(-c("Shape_Leng", "Shape_Area"))
+cached_nyed_geo <- file.path(clean_data_dir, "ny_election_results_by_year_geo.gpkg")
+if (!file.exists(cached_nyed_geo)) {
+  st_write(nyed_geo, dsn = cached_nyed_geo, driver = "GPKG")
+}
+
+# Finally merge the NY election_results with the COVID data and cache that
+# Use the cached versions
+cached_covid_election_src <- file.path(clean_data_dir, "covid_nyer_geo.gpkg")
+covid_data_df <- st_read(cached_covid_merged_geo)
+nyed_sf <- st_read(cached_nyed_geo)
+# if (!file.exists(cached_covid_election_src)) {
+#   covid_election_geo_merged <- st_join(
+#     covid_merged_geo,
+#     nyed_geo,
+#     join = st_covers,
+#     left = TRUE,
+#     largest = TRUE,
+#   )
+#   st_write(covid_election_geo_merged,
+#            dsn = cached_covid_election_src,
+#            driver = "GPKG")
+# } 
