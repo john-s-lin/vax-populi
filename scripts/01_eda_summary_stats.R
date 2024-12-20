@@ -8,6 +8,7 @@ library(ggplot2)
 raw_data_dir <- file.path(getwd(), "data", "raw")
 output_dir <- file.path(getwd(), "out", "eda")
 clean_data_dir <- file.path(getwd(), "data", "clean")
+cached_covid_election_src <- file.path(clean_data_dir, "covid_nyer_merged_geo.gpkg")
 
 if (!file.exists(output_dir)) {
   dir.create(output_dir, mode = "0755", recursive = TRUE)
@@ -15,6 +16,10 @@ if (!file.exists(output_dir)) {
 
 if (!file.exists(clean_data_dir)) {
   dir.create(clean_data_dir, mode = "0755", recursive = TRUE)
+}
+
+if (file.exists(cached_covid_election_src)) {
+  stop("Merged SF data already cached. No need to run this file.")
 }
 
 # Transform to lat-lon for visualization
@@ -69,7 +74,6 @@ nyed_gg_map <- file.path(output_dir, "nyed_gg.png")
 if (!file.exists(nyed_gg_map)) {
   ggsave(nyed_gg_map, plot = nyed_gg)
 }
-
 
 modzcta_gg <- ggplot(data = ny_modzcta) +
   geom_sf(aes(fill = "MODZCTA"), alpha = 0.5, color = "red") +
@@ -151,8 +155,6 @@ covid_merged_geo <- merge(covid_data_merged, ny_modzcta, by = "MODZCTA") %>%
 cached_covid_merged_geo <- file.path(clean_data_dir, "covid_data_merged_geo.gpkg")
 if (!file.exists(cached_covid_merged_geo)) {
   st_write(covid_merged_geo, dsn = cached_covid_merged_geo, driver = "GPKG")
-} else {
-  covid_merged_geo <- st_read(cached_nyed_geo, geometry_column = "geom")
 }
 
 # Same thing with electoral data, merge by electoral district
@@ -170,18 +172,17 @@ if (!file.exists(cached_nyed_geo)) {
 
 # Finally merge the NY election_results with the COVID data and cache that
 # Use the cached versions
-cached_covid_election_src <- file.path(clean_data_dir, "covid_nyer_geo.gpkg")
-covid_data_df <- st_read(cached_covid_merged_geo)
+covid_data_sf <- st_read(cached_covid_merged_geo)
 nyed_sf <- st_read(cached_nyed_geo)
-# if (!file.exists(cached_covid_election_src)) {
-#   covid_election_geo_merged <- st_join(
-#     covid_merged_geo,
-#     nyed_geo,
-#     join = st_covers,
-#     left = TRUE,
-#     largest = TRUE,
-#   )
-#   st_write(covid_election_geo_merged,
-#            dsn = cached_covid_election_src,
-#            driver = "GPKG")
-# } 
+if (!file.exists(cached_covid_election_src)) {
+  covid_election_geo_merged <- st_join(
+    covid_data_sf,
+    nyed_sf,
+    join = st_covers,
+    left = TRUE,
+    largest = TRUE,
+  )
+  st_write(covid_election_geo_merged,
+           dsn = cached_covid_election_src,
+           driver = "GPKG")
+} 
