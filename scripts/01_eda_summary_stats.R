@@ -142,15 +142,14 @@ names(covid_data_merged)[names(covid_data_merged) == "NEIGHBORHOOD_NAME.x"] <- "
 write.csv(
   covid_data_merged,
   file = file.path(clean_data_dir, "covid_data_merged_no_geo.csv"),
-  sep = ",",
   row.names = FALSE
 )
 
 # Merge by MODZCTA with the geometry, then cache as a shapefile
 covid_merged_geo <- merge(covid_data_merged, ny_modzcta, by = "MODZCTA") %>%
-  select(-c("id"))
+  select(-c("id", "label"))
 st_write(
   covid_merged_geo,
-  dsn = file.path(clean_data_dir, "covid_data_merged_geo.geo.json"),
-  driver = "GeoJSON"
+  dsn = file.path(clean_data_dir, "covid_data_merged_geo.shp"),
+  driver = "ESRI Shapefile"
 )
