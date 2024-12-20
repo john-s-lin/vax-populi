@@ -8,7 +8,8 @@ library(ggplot2)
 raw_data_dir <- file.path(getwd(), "data", "raw")
 output_dir <- file.path(getwd(), "out", "eda")
 clean_data_dir <- file.path(getwd(), "data", "clean")
-cached_covid_election_src <- file.path(clean_data_dir, "covid_nyer_merged_geo.gpkg")
+cached_covid_election_2020_src <- file.path(clean_data_dir, "covid_nyer_merged_geo_2020.gpkg")
+cached_covid_election_2024_src <- file.path(clean_data_dir, "covid_nyer_merged_geo_2024.gpkg")
 
 if (!file.exists(output_dir)) {
   dir.create(output_dir, mode = "0755", recursive = TRUE)
@@ -18,7 +19,8 @@ if (!file.exists(clean_data_dir)) {
   dir.create(clean_data_dir, mode = "0755", recursive = TRUE)
 }
 
-if (file.exists(cached_covid_election_src)) {
+if (file.exists(cached_covid_election_2020_src) &&
+    file.exists(cached_covid_election_2024_src)) {
   stop("Merged SF data already cached. No need to run this file.")
 }
 
@@ -174,15 +176,33 @@ if (!file.exists(cached_nyed_geo)) {
 # Use the cached versions
 covid_data_sf <- st_read(cached_covid_merged_geo)
 nyed_sf <- st_read(cached_nyed_geo)
-if (!file.exists(cached_covid_election_src)) {
-  covid_election_geo_merged <- st_join(
+
+# Filter by year and join
+nyed_sf_2020 <- filter(nyed_sf, year == "2020")
+nyed_sf_2024 <- filter(nyed_sf, year == "2024")
+
+if (!file.exists(cached_covid_election_2020_src)) {
+  covid_election_2020_geo_merged <- st_join(
     covid_data_sf,
-    nyed_sf,
+    nyed_sf_2020,
     join = st_covers,
     left = TRUE,
     largest = TRUE,
   )
-  st_write(covid_election_geo_merged,
-           dsn = cached_covid_election_src,
+  st_write(covid_election_2020_geo_merged,
+           dsn = cached_covid_election_2020_src,
            driver = "GPKG")
-} 
+}
+
+if (!file.exists(cached_covid_election_2024_src)) {
+  covid_election_2024_geo_merged <- st_join(
+    covid_data_sf,
+    nyed_sf_2024,
+    join = st_covers,
+    left = TRUE,
+    largest = TRUE,
+  )
+  st_write(covid_election_2024_geo_merged,
+           dsn = cached_covid_election_2024_src,
+           driver = "GPKG")
+}
