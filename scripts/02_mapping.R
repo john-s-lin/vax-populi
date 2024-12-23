@@ -1,10 +1,10 @@
 library(dplyr)
-library(sf)
+library(ggplot2)
 library(leaflet)
 library(mapview)
-library(webshot2)
-library(ggplot2)
 library(RColorBrewer)
+library(sf)
+library(webshot2)
 
 # Source util functions
 # - normalize_rates(dataset)

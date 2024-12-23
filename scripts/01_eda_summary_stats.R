@@ -1,9 +1,9 @@
-library(sf)
-library(leaflet)
 library(dplyr)
-library(mapview)
-library(webshot2)
 library(ggplot2)
+library(leaflet)
+library(mapview)
+library(sf)
+library(webshot2)
 
 raw_data_dir <- file.path(getwd(), "data", "raw")
 output_dir <- file.path(getwd(), "out", "eda")

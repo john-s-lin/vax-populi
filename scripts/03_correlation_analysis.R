@@ -1,7 +1,7 @@
-library(sf)
 library(ggplot2)
-library(RColorBrewer)
 library(jsonlite) # To save text results as readable JSON
+library(RColorBrewer)
+library(sf)
 
 # Source util functions
 # - normalize_rates(dataset)
