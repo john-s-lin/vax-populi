@@ -1,0 +1,44 @@
+[
+  {
+    "x": "Democrat Fraction 2020",
+    "y": "COVID Case Rate",
+    "correlation": -0.3869,
+    "p_value": 1.1336e-07,
+    "_row": "cor"
+  },
+  {
+    "x": "Democrat Fraction 2024",
+    "y": "COVID Case Rate",
+    "correlation": -0.3304,
+    "p_value": 9.5669e-06,
+    "_row": "cor1"
+  },
+  {
+    "x": "Democrat Fraction 2020",
+    "y": "COVID Death Rate",
+    "correlation": -0.1545,
+    "p_value": 0.0406,
+    "_row": "cor2"
+  },
+  {
+    "x": "Democrat Fraction 2024",
+    "y": "COVID Death Rate",
+    "correlation": -0.2395,
+    "p_value": 0.0016,
+    "_row": "cor3"
+  },
+  {
+    "x": "Democrat Fraction 2020",
+    "y": "COVID Percent Fully Vaccinated",
+    "correlation": -0.0225,
+    "p_value": 0.7665,
+    "_row": "cor4"
+  },
+  {
+    "x": "Democrat Fraction 2024",
+    "y": "COVID Percent Fully Vaccinated",
+    "correlation": 0.0177,
+    "p_value": 0.818,
+    "_row": "cor5"
+  }
+]
