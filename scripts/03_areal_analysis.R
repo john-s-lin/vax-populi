@@ -10,9 +10,14 @@ source("R/utils.R")
 
 clean_data_dir <- file.path(getwd(), "data", "clean")
 output_dir <- file.path(getwd(), "out", "areal")
+histogram_dir <- file.path(output_dir, "histograms")
+correlations_dir <- file.path(output_dir, "correlations")
 
-if (!file.exists(output_dir)) {
-  dir.create(output_dir, mode = "0755", recursive = TRUE)
+if (!file.exists(histogram_dir)) {
+  dir.create(histogram_dir, mode = "0755", recursive = TRUE)
+}
+if (!file.exists(correlations_dir)) {
+  dir.create(correlations_dir, mode = "0755", recursive = TRUE)
 }
 
 cached_covid_v_er_2020_src <- file.path(clean_data_dir, "covid_nyer_merged_geo_2020.gpkg")
@@ -57,7 +62,7 @@ hist_covid_case_rates <- generate_gg_histogram(
   title = "Distribution of COVID Case Rates",
   x_lab = "Case Rates"
 )
-ggsave(file.path(output_dir, "covid_case_rates_hist.png"), plot = hist_covid_case_rates)
+ggsave(file.path(histogram_dir, "covid_case_rates_hist.png"), plot = hist_covid_case_rates)
 
 # Case count
 hist_covid_case_counts <- generate_gg_histogram(
@@ -67,7 +72,7 @@ hist_covid_case_counts <- generate_gg_histogram(
   title = "Distribution of COVID Case Count",
   x_lab = "Case Counts"
 )
-ggsave(file.path(output_dir, "covid_case_count_hist.png"), plot = hist_covid_case_counts)
+ggsave(file.path(histogram_dir, "covid_case_count_hist.png"), plot = hist_covid_case_counts)
 
 # Deaths
 hist_covid_death_rates <- generate_gg_histogram(
@@ -77,7 +82,7 @@ hist_covid_death_rates <- generate_gg_histogram(
   title = "Distribution of COVID Death Rates",
   x_lab = "Death Rate"
 )
-ggsave(file.path(output_dir, "covid_death_rates_hist.png"), plot = hist_covid_death_rates)
+ggsave(file.path(histogram_dir, "covid_death_rates_hist.png"), plot = hist_covid_death_rates)
 
 hist_covid_death_count <- generate_gg_histogram(
   dataset = covid_v_er_2020,
@@ -86,7 +91,7 @@ hist_covid_death_count <- generate_gg_histogram(
   title = "Distribution of COVID Death Count",
   x_lab = "Death Count"
 )
-ggsave(file.path(output_dir, "covid_death_count_hist.png"), plot = hist_covid_death_count)
+ggsave(file.path(histogram_dir, "covid_death_count_hist.png"), plot = hist_covid_death_count)
 
 # Vaccinations
 hist_covid_vax_rates <- generate_gg_histogram(
@@ -96,7 +101,7 @@ hist_covid_vax_rates <- generate_gg_histogram(
   title = "Distribution of COVID Fully Vaccinated Rates",
   x_lab = "Fully Vaccinated Rate"
 )
-ggsave(file.path(output_dir, "covid_vax_rate_hist.png"), plot = hist_covid_vax_rates)
+ggsave(file.path(histogram_dir, "covid_vax_rate_hist.png"), plot = hist_covid_vax_rates)
 
 hist_covid_vax_count <- generate_gg_histogram(
   dataset = covid_v_er_2020,
@@ -105,7 +110,7 @@ hist_covid_vax_count <- generate_gg_histogram(
   title = "Distribution of COVID Fully Vaccinated Count",
   x_lab = "Fully Vaccinated Rate"
 )
-ggsave(file.path(output_dir, "covid_vax_count_hist.png"), plot = hist_covid_vax_count)
+ggsave(file.path(histogram_dir, "covid_vax_count_hist.png"), plot = hist_covid_vax_count)
 
 # Voting 2020
 # Republican Fraction
@@ -116,7 +121,7 @@ hist_gop_frac_2020 <- generate_gg_histogram(
   title = "Histogram of Republican Voting Fraction 2020",
   x_lab = "Proportion of Republicans out of Total Republican + Democrat Voters"
 )
-ggsave(file.path(output_dir, "gop_frac_2020_hist.png"), plot = hist_gop_frac_2020)
+ggsave(file.path(histogram_dir, "gop_frac_2020_hist.png"), plot = hist_gop_frac_2020)
 
 # Democrat Fraction
 hist_dem_frac_2020 <- generate_gg_histogram(
@@ -126,7 +131,7 @@ hist_dem_frac_2020 <- generate_gg_histogram(
   title = "Histogram of Democrat Voting Fraction 2020",
   x_lab = "Proportion of Democrat out of Total Republican + Democrat Voters"
 )
-ggsave(file.path(output_dir, "dem_frac_2020_hist.png"), plot = hist_dem_frac_2020)
+ggsave(file.path(histogram_dir, "dem_frac_2020_hist.png"), plot = hist_dem_frac_2020)
 
 # Voting 2024
 # Republican Fraction
@@ -137,7 +142,7 @@ hist_gop_frac_2024 <- generate_gg_histogram(
   title = "Histogram of Republican Voting Fraction 2024",
   x_lab = "Proportion of Republicans out of Total Republican + Democrat Voters"
 )
-ggsave(file.path(output_dir, "gop_frac_2024_hist.png"), plot = hist_gop_frac_2024)
+ggsave(file.path(histogram_dir, "gop_frac_2024_hist.png"), plot = hist_gop_frac_2024)
 
 # Democrat Fraction
 hist_dem_frac_2024 <- generate_gg_histogram(
@@ -147,7 +152,7 @@ hist_dem_frac_2024 <- generate_gg_histogram(
   title = "Histogram of Democrat Voting Fraction 2024",
   x_lab = "Proportion of Democrat out of Total Republican + Democrat Voters"
 )
-ggsave(file.path(output_dir, "dem_frac_2024_hist.png"), plot = hist_dem_frac_2024)
+ggsave(file.path(histogram_dir, "dem_frac_2024_hist.png"), plot = hist_dem_frac_2024)
 
 # Correlations
 # Note: correlations for Republican fraction are just -1 * correlation_vs_democrat_fraction
@@ -216,5 +221,108 @@ correlations = list(
 
 corr_df <- do.call(rbind, lapply(correlations, as.data.frame))
 
-output_json_path <- file.path(output_dir, "correlations.json")
+output_json_path <- file.path(correlations_dir, "correlations.json")
 write_json(corr_df, output_json_path, pretty = TRUE)
+
+# Correlation Plots
+plot_correlation <- function(dataset,
+                             cx,
+                             cy,
+                             pal,
+                             title,
+                             x_label,
+                             y_label) {
+  # Drop rows with NA or NULL for the specified columns
+  dataset <- dataset %>% filter(!is.na(.data[[cx]]), !is.na(.data[[cy]]))
+  
+  # Generate the scatter plot with correlation trend line
+  plot <- ggplot(dataset, aes(x = .data[[cx]], y = .data[[cy]])) +
+    geom_point(
+      aes(fill = .data[[cx]]),
+      pch = 21,
+      size = 3,
+      color = "black",
+      alpha = 0.7,
+      show.legend = FALSE
+    ) +
+    scale_fill_gradientn(colors = pal) +
+    geom_smooth(formula = y ~ x, method = "lm") +
+    labs(
+      title = title,
+      x = x_label,
+      y = y_label,
+      color = x_label
+    ) +
+    theme_light()
+  
+  return(plot)
+}
+
+# Plot case rates vs. political alignment
+corr_plot_case_rates_v_pa_2020 <- plot_correlation(
+  dataset = covid_v_er_2020,
+  cx = "democrat_two_party_frac",
+  cy = "COVID_CASE_RATE",
+  pal = brewer.pal(11, "RdYlBu"),
+  title = "Political Alignment vs. COVID Case Rates 2020",
+  x_label = "Political alignment",
+  y_label = "Case rate"
+)
+ggsave(file.path(correlations_dir, "corr_plot_case_rates_v_pa_2020.png"), plot = corr_plot_case_rates_v_pa_2020)
+
+corr_plot_case_rates_v_pa_2024 <- plot_correlation(
+  dataset = covid_v_er_2024,
+  cx = "democrat_two_party_frac",
+  cy = "COVID_CASE_RATE",
+  pal = brewer.pal(11, "RdYlBu"),
+  title = "Political Alignment vs. COVID Case Rates 2024",
+  x_label = "Political alignment",
+  y_label = "Case rate"
+)
+ggsave(file.path(correlations_dir, "corr_plot_case_rates_v_pa_2024.png"), plot = corr_plot_case_rates_v_pa_2024)
+
+# Plot death rates vs. political alignment
+corr_plot_death_rates_v_pa_2020 <- plot_correlation(
+  dataset = covid_v_er_2020,
+  cx = "democrat_two_party_frac",
+  cy = "COVID_DEATH_RATE",
+  pal = brewer.pal(11, "RdYlBu"),
+  title = "Political Alignment vs. COVID Death Rates 2020",
+  x_label = "Political alignment",
+  y_label = "Death rate"
+)
+ggsave(file.path(correlations_dir, "corr_plot_death_rates_v_pa_2020.png"), plot = corr_plot_death_rates_v_pa_2020)
+
+corr_plot_death_rates_v_pa_2024 <- plot_correlation(
+  dataset = covid_v_er_2024,
+  cx = "democrat_two_party_frac",
+  cy = "COVID_DEATH_RATE",
+  pal = brewer.pal(11, "RdYlBu"),
+  title = "Political Alignment vs. COVID Death Rates 2024",
+  x_label = "Political alignment",
+  y_label = "Death rate"
+)
+ggsave(file.path(correlations_dir, "corr_plot_death_rates_v_pa_2024.png"), plot = corr_plot_death_rates_v_pa_2024)
+
+# Plot vax rates vs. political alignment
+corr_plot_vax_rates_v_pa_2020 <- plot_correlation(
+  dataset = covid_v_er_2020,
+  cx = "democrat_two_party_frac",
+  cy = "PERC_FULLY",
+  pal = brewer.pal(11, "RdYlBu"),
+  title = "Political Alignment vs. COVID Fully Vaccinated Rates 2020",
+  x_label = "Political alignment",
+  y_label = "Fully vaccinated rate"
+)
+ggsave(file.path(correlations_dir, "corr_plot_vax_rates_v_pa_2020.png"), plot = corr_plot_vax_rates_v_pa_2020)
+
+corr_plot_vax_rates_v_pa_2024 <- plot_correlation(
+  dataset = covid_v_er_2024,
+  cx = "democrat_two_party_frac",
+  cy = "PERC_FULLY",
+  pal = brewer.pal(11, "RdYlBu"),
+  title = "Political Alignment vs. COVID Fully Vaccinated Rates 2024",
+  x_label = "Political alignment",
+  y_label = "Fully vaccinated rate"
+)
+ggsave(file.path(correlations_dir, "corr_plot_vax_rates_v_pa_2024.png"), plot = corr_plot_vax_rates_v_pa_2024)
