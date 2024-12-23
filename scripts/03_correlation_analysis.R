@@ -8,7 +8,7 @@ library(jsonlite) # To save text results as readable JSON
 source("R/utils.R")
 
 clean_data_dir <- file.path(getwd(), "data", "clean")
-output_dir <- file.path(getwd(), "out", "areal")
+output_dir <- file.path(getwd(), "out")
 histogram_dir <- file.path(output_dir, "histograms")
 correlations_dir <- file.path(output_dir, "correlations")
 
