@@ -6,6 +6,10 @@ library(webshot2)
 library(ggplot2)
 library(RColorBrewer)
 
+# Source util functions
+# - normalize_rates(dataset)
+source("R/utils.R")
+
 clean_data_dir <- file.path(getwd(), "data", "clean")
 cached_covid_er_geo_2020 <- file.path(clean_data_dir, "covid_nyer_merged_geo_2020.gpkg")
 cached_covid_er_geo_2024 <- file.path(clean_data_dir, "covid_nyer_merged_geo_2024.gpkg")
@@ -15,39 +19,11 @@ if (!file.exists(output_dir)) {
   dir.create(output_dir, mode = "0755", recursive = TRUE)
 }
 
-covid_v_er_2020 <- st_read(cached_covid_er_geo_2020)
-covid_v_er_2024 <- st_read(cached_covid_er_geo_2024)
+covid_v_er_2020_raw <- st_read(cached_covid_er_geo_2020)
+covid_v_er_2024_raw <- st_read(cached_covid_er_geo_2024)
 
-normalize_rates <- function(dataset) {
-  # Convert case rates from rate/100_000 people to fraction between [0, 1]
-  dataset <- mutate(dataset, across(
-    c(
-      "COVID_CONFIRMED_CASE_RATE",
-      "COVID_CASE_RATE",
-      "COVID_DEATH_RATE"
-    ),
-    ~ . / 100000
-  ))
-  # Convert percentage vaccinated into fraction between [0, 1]
-  dataset <- mutate(dataset, across(
-    c(
-      "PERC_PARTIALLY",
-      "PERC_FULLY",
-      "PERC_1PLUS",
-      "PERC_ADDITIONAL",
-      "PERC_BIVALENT_ADDITIONAL"
-    ),
-    ~ . / 100
-  ))
-  # Store ratio of republican voters over sum of Dem + Rep parties, ignore Green and Libertarian
-  dataset$two_party_total <- dataset$republican + dataset$democratic
-  dataset$republican_two_party_frac <- dataset$republican / dataset$two_party_total
-  dataset$democrat_two_party_frac <- 1 - dataset$republican_two_party_frac
-  return(dataset)
-}
-
-covid_v_er_2020 <- normalize_rates(covid_v_er_2020)
-covid_v_er_2024 <- normalize_rates(covid_v_er_2024)
+covid_v_er_2020 <- normalize_rates(covid_v_er_2020_raw)
+covid_v_er_2024 <- normalize_rates(covid_v_er_2024_raw)
 
 # Generate a leaflet map with the desired column
 generate_leaflet_map <- function(dataset, column_name, palette, title) {
