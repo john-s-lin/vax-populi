@@ -1,4 +1,3 @@
-library(spdep)
 library(sf)
 library(ggplot2)
 library(RColorBrewer)
