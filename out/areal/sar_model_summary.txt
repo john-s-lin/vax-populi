@@ -1,0 +1,29 @@
+
+Call:sacsarlm(formula = scale(COVID_CASE_RATE) ~ democrat_two_party_frac +     PERC_FULLY, data = covid_v_er_2020, listw = knn_6_ny_weights)
+
+Residuals:
+       Min         1Q     Median         3Q        Max 
+-2.3659326 -0.3707632 -0.0088514  0.3650046  2.1646345 
+
+Type: sac 
+Coefficients: (asymptotic standard errors) 
+                        Estimate Std. Error z value  Pr(>|z|)
+(Intercept)             -3.46721    0.51537 -6.7277 1.724e-11
+democrat_two_party_frac -0.11151    0.30108 -0.3704    0.7111
+PERC_FULLY               4.06339    0.41475  9.7972 < 2.2e-16
+
+Rho: -0.14385
+Asymptotic standard error: 0.19222
+    z-value: -0.74838, p-value: 0.45423
+Lambda: 0.82663
+Asymptotic standard error: 0.066323
+    z-value: 12.464, p-value: < 2.22e-16
+
+LR test value: 80.756, p-value: < 2.22e-16
+
+Log likelihood: -178.1037 for sac model
+ML residual variance (sigma squared): 0.37421, (sigma: 0.61172)
+Number of observations: 177 
+Number of parameters estimated: 6 
+AIC: 368.21, (AIC for lm: 444.96)
+

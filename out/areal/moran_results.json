@@ -29,20 +29,20 @@
   "knn_6_pa_2020": {
     "method": ["6-NN"],
     "metric": ["democrat_two_party_frac_2020"],
-    "statistic": [13.9768],
-    "p_value": [1.0792e-44],
-    "estimate": [0.5633],
+    "statistic": [13.0456],
+    "p_value": [3.3644e-39],
+    "estimate": [0.5219],
     "expectation": [-0.0057],
-    "variance": [0.0017]
+    "variance": [0.0016]
   },
   "knn_6_pa_2024": {
     "method": ["6-NN"],
     "metric": ["democrat_two_party_frac_2024"],
-    "statistic": [12.2682],
-    "p_value": [6.7126e-35],
-    "estimate": [0.5043],
-    "expectation": [-0.0058],
-    "variance": [0.0017]
+    "statistic": [10.5155],
+    "p_value": [3.665e-26],
+    "estimate": [0.4196],
+    "expectation": [-0.0057],
+    "variance": [0.0016]
   },
   "queen_case_rate": {
     "method": ["Queen"],
@@ -74,20 +74,20 @@
   "queen_pa_2020": {
     "method": ["Queen"],
     "metric": ["democrat_two_party_frac_2020"],
-    "statistic": [10.2865],
-    "p_value": [4.0527e-25],
-    "estimate": [0.5686],
+    "statistic": [9.6518],
+    "p_value": [2.416e-22],
+    "estimate": [0.5261],
     "expectation": [-0.0057],
-    "variance": [0.0031]
+    "variance": [0.003]
   },
   "queen_pa_2024": {
     "method": ["Queen"],
     "metric": ["democrat_two_party_frac_2024"],
-    "statistic": [9.8172],
-    "p_value": [4.7474e-23],
-    "estimate": [0.5475],
-    "expectation": [-0.0059],
-    "variance": [0.0032]
+    "statistic": [8.6571],
+    "p_value": [2.4186e-18],
+    "estimate": [0.4713],
+    "expectation": [-0.0057],
+    "variance": [0.003]
   },
   "idw_case_rate": {
     "method": ["IDW"],
@@ -119,19 +119,19 @@
   "idw_pa_2020": {
     "method": ["IDW"],
     "metric": ["democrat_two_party_frac_2020"],
-    "statistic": [15.6355],
-    "p_value": [2.0843e-55],
-    "estimate": [0.5653],
+    "statistic": [14.9204],
+    "p_value": [1.2136e-50],
+    "estimate": [0.5354],
     "expectation": [-0.0057],
     "variance": [0.0013]
   },
   "idw_pa_2024": {
     "method": ["IDW"],
     "metric": ["democrat_two_party_frac_2024"],
-    "statistic": [14.4777],
-    "p_value": [8.3793e-48],
-    "estimate": [0.5323],
-    "expectation": [-0.0058],
-    "variance": [0.0014]
+    "statistic": [12.1339],
+    "p_value": [3.4901e-34],
+    "estimate": [0.4344],
+    "expectation": [-0.0057],
+    "variance": [0.0013]
   }
 }

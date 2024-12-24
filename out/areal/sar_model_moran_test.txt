@@ -1,0 +1,12 @@
+
+	Moran I test under randomisation
+
+data:  sar_lag_error_residuals  
+weights: knn_6_ny_weights    
+
+Moran I statistic standard deviate = -0.11061, p-value = 0.544
+alternative hypothesis: greater
+sample estimates:
+Moran I statistic       Expectation          Variance 
+     -0.010133400      -0.005681818       0.001619794 
+

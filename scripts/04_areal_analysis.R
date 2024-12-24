@@ -2,8 +2,9 @@ library(dplyr)
 library(ggplot2)
 library(jsonlite)
 library(RColorBrewer)
-library(spdep)
+library(spdep) # For Moran's I, local G
 library(sf)
+library(spatialreg) # For SAR/CAR
 
 # Source util functions
 # - normalize_rates(dataset)
@@ -191,3 +192,263 @@ write_json(
 )
 
 # KNN should be better, but IDW comes as a close second
+# Correlograms and lag structures
+generate_correlogram <- function(neighbors,
+                                 dataset,
+                                 column_name,
+                                 order,
+                                 year = 2020) {
+  dataset <- dataset %>% filter(!is.na(.data[[column_name]]))
+  
+  # Recalculate neighbors if there are different lengths
+  # Specific to voting patterns since there are some that are NaN
+  if (length(neighbors) != length(dataset[[column_name]])) {
+    neighbors = st_centroid(dataset) %>%
+      st_coordinates() %>%
+      knearneigh(k = 6) %>%
+      knn2nb()
+  }
+  
+  # Generate the correlogram
+  cg <- sp.correlogram(
+    neighbors,
+    var = dataset[[column_name]],
+    order = order,
+    method = "I",
+    style = "W",
+    randomisation = FALSE,
+    zero.policy = TRUE
+  )
+  
+  # Extract results
+  correlogram_data <- data.frame(
+    lag = seq_along(cg$res[, 1]),
+    moran_i = cg$res[, 1],
+    # Moran's I
+    expectation = cg$res[, 2],
+    # Expectation
+    variance = cg$res[, 3]      # Variance
+  )
+  
+  # Calculate z-scores and p-values
+  correlogram_data <- correlogram_data %>%
+    mutate(
+      z_score = (moran_i - expectation) / sqrt(variance),
+      p_value = 2 * pnorm(-abs(z_score)) # Two-tailed p-value
+    )
+  
+  # Write to JSON
+  output_file <- file.path(areal_dir,
+                           paste0("correlogram_", column_name, "_", year, ".json"))
+  write_json(as.list(correlogram_data),
+             path = output_file,
+             pretty = TRUE)
+  
+  # Return the correlogram object
+  return(cg)
+}
+
+# Case rates
+cg_case_rates <- generate_correlogram(
+  neighbors = knn_6_ny_nb,
+  dataset = covid_v_er_2020_meters,
+  column_name = "COVID_CASE_RATE",
+  order = 7
+)
+
+# Death rates
+cg_death_rates <- generate_correlogram(
+  neighbors = knn_6_ny_nb,
+  dataset = covid_v_er_2020_meters,
+  column_name = "COVID_DEATH_RATE",
+  order = 7
+)
+
+# Vax rates
+cg_vax_rates <- generate_correlogram(
+  neighbors = knn_6_ny_nb,
+  dataset = covid_v_er_2020_meters,
+  column_name = "PERC_FULLY",
+  order = 7
+)
+
+# 2020 DEM rates
+cg_dem_2020 <- generate_correlogram(
+  neighbors = knn_6_ny_nb,
+  dataset = covid_v_er_2020_meters,
+  column_name = "democrat_two_party_frac",
+  order = 7
+)
+
+# 2024 DEM rates
+cg_dem_2024 <- generate_correlogram(
+  neighbors = knn_6_ny_nb,
+  dataset = covid_v_er_2024_meters,
+  column_name = "democrat_two_party_frac",
+  order = 7,
+  year = 2024
+)
+
+# 2020 GOP rates
+cg_rep_2020 <- generate_correlogram(
+  neighbors = knn_6_ny_nb,
+  dataset = covid_v_er_2020_meters,
+  column_name = "republican_two_party_frac",
+  order = 7
+)
+
+# 2024 GOP rates
+cg_rep_2024 <- generate_correlogram(
+  neighbors = knn_6_ny_nb,
+  dataset = covid_v_er_2024_meters,
+  column_name = "republican_two_party_frac",
+  order = 7,
+  year = 2024
+)
+
+# Generate correlogram plots with ggplot
+save_lag_plot <- function(correlogram, title, output_path) {
+  png(output_path, width = 800, height = 600)
+  plot(correlogram, main = title)
+  dev.off()
+}
+
+save_lag_plot(
+  correlogram = cg_case_rates,
+  title = "KNN-6 Lags for COVID Case Rates",
+  output_path = file.path(areal_dir, "case_rates_lag_plot.png")
+)
+save_lag_plot(
+  correlogram = cg_death_rates,
+  title = "KNN-6 Lags for COVID Death Rates",
+  output_path = file.path(areal_dir, "death_rates_lag_plot.png")
+)
+save_lag_plot(
+  correlogram = cg_vax_rates,
+  title = "KNN-6 Lags for COVID Vaccination Rates",
+  output_path = file.path(areal_dir, "vax_rates_lag_plot.png")
+)
+save_lag_plot(
+  correlogram = cg_dem_2020,
+  title = "KNN-6 Lags for Democrat Two Party Fraction, 2020",
+  output_path = file.path(areal_dir, "dem_2020_lag_plot.png")
+)
+save_lag_plot(
+  correlogram = cg_dem_2024,
+  title = "KNN-6 Lags for Democrat Two Party Fraction, 2024",
+  output_path = file.path(areal_dir, "dem_2024_lag_plot.png")
+)
+save_lag_plot(
+  correlogram = cg_rep_2020,
+  title = "KNN-6 Lags for Republican Two Party Fraction, 2020",
+  output_path = file.path(areal_dir, "rep_2020_lag_plot.png")
+)
+save_lag_plot(
+  correlogram = cg_rep_2024,
+  title = "KNN-6 Lags for Republic Two Party Fraction, 2024",
+  output_path = file.path(areal_dir, "rep_2024_lag_plot.png")
+)
+
+# Getis-Ord G*
+# Reset to use WGS84 coordinates
+ny_centroids_coords_84 <- st_centroid(covid_v_er_2020) %>% st_coordinates()
+knn_1_nb_84 <- knearneigh(ny_centroids_coords_84, k = 1) %>% knn2nb()
+knn_1_weights_84 <- nb2listw(knn_1_nb_84, style = "B")
+
+# Case rates
+gi_star_case_rates <- localG(covid_v_er_2020$COVID_CASE_RATE, knn_1_weights_84)
+
+# Death rates
+gi_star_death_rates <- localG(covid_v_er_2020$COVID_DEATH_RATE, knn_1_weights_84)
+
+# Vax rates
+gi_star_vax_rates <- localG(covid_v_er_2020$PERC_FULLY, knn_1_weights_84)
+
+# PA 2020 rates
+gi_star_dem_2020 <- localG(covid_v_er_2020$democrat_two_party_frac, knn_1_weights_84)
+
+# PA 2024 rates
+gi_star_dem_2024 <- localG(covid_v_er_2024$democrat_two_party_frac, knn_1_weights_84)
+
+# Add G* scores to the dataset
+covid_v_er_2020$G_STAR_CASE_RATE <- as.numeric(gi_star_case_rates)
+covid_v_er_2020$G_STAR_DEATH_RATE <- as.numeric(gi_star_death_rates)
+covid_v_er_2020$G_STAR_VAX_RATE <- as.numeric(gi_star_vax_rates)
+covid_v_er_2020$G_STAR_DEM_2020 <- as.numeric(gi_star_dem_2020)
+covid_v_er_2020$G_STAR_DEM_2024 <- as.numeric(gi_star_dem_2024)
+
+# Define a function to plot and save the G* score maps
+save_getis_ord_map <- function(dataset, column_name, title, output_path) {
+  map <- ggplot(data = dataset) +
+    geom_sf(aes_string(fill = column_name)) +
+    scale_fill_gradient2(
+      name = "G* Score",
+      low = "blue",
+      mid = "white",
+      high = "red",
+      midpoint = 0
+    ) +
+    labs(title = title) +
+    theme_light()
+  
+  # Save the map as a PNG file
+  ggsave(
+    filename = output_path,
+    plot = map,
+    width = 8,
+    height = 6
+  )
+}
+
+# Save maps for G* scores
+save_getis_ord_map(
+  dataset = covid_v_er_2020,
+  column_name = "G_STAR_CASE_RATE",
+  title = "Getis-Ord G* for COVID Case Rates (2020)",
+  output_path = file.path(areal_dir, "g_star_case_rate_2020.png")
+)
+
+save_getis_ord_map(
+  dataset = covid_v_er_2020,
+  column_name = "G_STAR_DEATH_RATE",
+  title = "Getis-Ord G* for COVID Death Rates (2020)",
+  output_path = file.path(areal_dir, "g_star_death_rate_2020.png")
+)
+
+save_getis_ord_map(
+  dataset = covid_v_er_2020,
+  column_name = "G_STAR_VAX_RATE",
+  title = "Getis-Ord G* for Vaccination Rates (2020)",
+  output_path = file.path(areal_dir, "g_star_vax_rate_2020.png")
+)
+
+save_getis_ord_map(
+  dataset = covid_v_er_2020,
+  column_name = "G_STAR_DEM_2020",
+  title = "Getis-Ord G* for Democrat Two Party Fraction (2020)",
+  output_path = file.path(areal_dir, "g_star_dem_2020.png")
+)
+
+save_getis_ord_map(
+  dataset = covid_v_er_2020,
+  column_name = "G_STAR_DEM_2024",
+  title = "Getis-Ord G* for Democrat Two Party Fraction (2024)",
+  output_path = file.path(areal_dir, "g_star_dem_2024.png")
+)
+
+# SAR spatial lag-error
+sar_lag_error_case_rate <- sacsarlm(
+  formula = scale(COVID_CASE_RATE) ~ democrat_two_party_frac + PERC_FULLY,
+  data = covid_v_er_2020,
+  listw = knn_6_ny_weights
+)
+sar_lag_error_residuals <- residuals(sar_lag_error_case_rate)
+sar_lag_error_moran_residuals <- moran.test(sar_lag_error_residuals, listw = knn_6_ny_weights)
+
+# Capture and save the summary output
+summary_output <- capture.output(summary(sar_lag_error_case_rate))
+writeLines(summary_output, con = file.path(areal_dir, "sar_model_summary.txt"))
+
+# Save Moran's test results (optional, for diagnostics)
+moran_output <- capture.output(sar_lag_error_moran_residuals)
+writeLines(moran_output, con = file.path(areal_dir, "sar_model_moran_test.txt"))
