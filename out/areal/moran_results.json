@@ -1,0 +1,137 @@
+{
+  "knn_6_case_rate": {
+    "method": ["6-NN"],
+    "metric": ["COVID_CASE_RATE"],
+    "statistic": [10.7859],
+    "p_value": [2.0074e-27],
+    "estimate": [0.4305],
+    "expectation": [-0.0057],
+    "variance": [0.0016]
+  },
+  "knn_6_death_rate": {
+    "method": ["6-NN"],
+    "metric": ["COVID_DEATH_RATE"],
+    "statistic": [11.1769],
+    "p_value": [2.644e-29],
+    "estimate": [0.4463],
+    "expectation": [-0.0057],
+    "variance": [0.0016]
+  },
+  "knn_6_vax_rate": {
+    "method": ["6-NN"],
+    "metric": ["PERC_FULLY"],
+    "statistic": [9.9011],
+    "p_value": [2.0588e-23],
+    "estimate": [0.3947],
+    "expectation": [-0.0057],
+    "variance": [0.0016]
+  },
+  "knn_6_pa_2020": {
+    "method": ["6-NN"],
+    "metric": ["democrat_two_party_frac_2020"],
+    "statistic": [13.9768],
+    "p_value": [1.0792e-44],
+    "estimate": [0.5633],
+    "expectation": [-0.0057],
+    "variance": [0.0017]
+  },
+  "knn_6_pa_2024": {
+    "method": ["6-NN"],
+    "metric": ["democrat_two_party_frac_2024"],
+    "statistic": [12.2682],
+    "p_value": [6.7126e-35],
+    "estimate": [0.5043],
+    "expectation": [-0.0058],
+    "variance": [0.0017]
+  },
+  "queen_case_rate": {
+    "method": ["Queen"],
+    "metric": ["COVID_CASE_RATE"],
+    "statistic": [8.582],
+    "p_value": [4.6627e-18],
+    "estimate": [0.4672],
+    "expectation": [-0.0057],
+    "variance": [0.003]
+  },
+  "queen_death_rate": {
+    "method": ["Queen"],
+    "metric": ["COVID_DEATH_RATE"],
+    "statistic": [8.5888],
+    "p_value": [4.3948e-18],
+    "estimate": [0.4676],
+    "expectation": [-0.0057],
+    "variance": [0.003]
+  },
+  "queen_vax_rate": {
+    "method": ["Queen"],
+    "metric": ["PERC_FULLY"],
+    "statistic": [7.9847],
+    "p_value": [7.0413e-16],
+    "estimate": [0.4343],
+    "expectation": [-0.0057],
+    "variance": [0.003]
+  },
+  "queen_pa_2020": {
+    "method": ["Queen"],
+    "metric": ["democrat_two_party_frac_2020"],
+    "statistic": [10.2865],
+    "p_value": [4.0527e-25],
+    "estimate": [0.5686],
+    "expectation": [-0.0057],
+    "variance": [0.0031]
+  },
+  "queen_pa_2024": {
+    "method": ["Queen"],
+    "metric": ["democrat_two_party_frac_2024"],
+    "statistic": [9.8172],
+    "p_value": [4.7474e-23],
+    "estimate": [0.5475],
+    "expectation": [-0.0059],
+    "variance": [0.0032]
+  },
+  "idw_case_rate": {
+    "method": ["IDW"],
+    "metric": ["COVID_CASE_RATE"],
+    "statistic": [10.7632],
+    "p_value": [2.5686e-27],
+    "estimate": [0.3847],
+    "expectation": [-0.0057],
+    "variance": [0.0013]
+  },
+  "idw_death_rate": {
+    "method": ["IDW"],
+    "metric": ["COVID_DEATH_RATE"],
+    "statistic": [11.2114],
+    "p_value": [1.7932e-29],
+    "estimate": [0.4009],
+    "expectation": [-0.0057],
+    "variance": [0.0013]
+  },
+  "idw_vax_rate": {
+    "method": ["IDW"],
+    "metric": ["PERC_FULLY"],
+    "statistic": [6.1612],
+    "p_value": [3.6087e-10],
+    "estimate": [0.2178],
+    "expectation": [-0.0057],
+    "variance": [0.0013]
+  },
+  "idw_pa_2020": {
+    "method": ["IDW"],
+    "metric": ["democrat_two_party_frac_2020"],
+    "statistic": [15.6355],
+    "p_value": [2.0843e-55],
+    "estimate": [0.5653],
+    "expectation": [-0.0057],
+    "variance": [0.0013]
+  },
+  "idw_pa_2024": {
+    "method": ["IDW"],
+    "metric": ["democrat_two_party_frac_2024"],
+    "statistic": [14.4777],
+    "p_value": [8.3793e-48],
+    "estimate": [0.5323],
+    "expectation": [-0.0058],
+    "variance": [0.0014]
+  }
+}
