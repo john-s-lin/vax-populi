@@ -40,5 +40,19 @@
     "correlation": 0.0177,
     "p_value": 0.818,
     "_row": "cor5"
+  },
+  {
+    "x": "COVID Percent Fully Vaccinated",
+    "y": "Case rate",
+    "correlation": 0.3324,
+    "p_value": 6.1842e-06,
+    "_row": "cor6"
+  },
+  {
+    "x": "COVID Percent Fully Vaccinated",
+    "y": "Death rate",
+    "correlation": -0.195,
+    "p_value": 0.0093,
+    "_row": "cor7"
   }
 ]

@@ -208,6 +208,23 @@ corr_vax_rate_v_dem_2024 <- calc_corr_test(
   y_label = "COVID Percent Fully Vaccinated"
 )
 
+# Vax rate vs. case rate
+corr_vax_rate_v_case_rate <- calc_corr_test(
+  x = covid_v_er_2024$PERC_FULLY,
+  y = covid_v_er_2024$COVID_CONFIRMED_CASE_RATE,
+  x_label = "COVID Percent Fully Vaccinated",
+  y_label = "Case rate"
+)
+
+# Vax rate vs. death rate
+corr_vax_rate_v_death_rate <- calc_corr_test(
+  x = covid_v_er_2024$PERC_FULLY,
+  y = covid_v_er_2024$COVID_DEATH_RATE,
+  x_label = "COVID Percent Fully Vaccinated",
+  y_label = "Death rate"
+)
+
+
 # Compile correlations with rbind into a dataframe, then store as JSON
 correlations = list(
   corr_case_rate_v_dem_2020,
@@ -215,7 +232,9 @@ correlations = list(
   corr_death_rate_v_dem_2020,
   corr_death_rate_v_dem_2024,
   corr_vax_rate_v_dem_2020,
-  corr_vax_rate_v_dem_2024
+  corr_vax_rate_v_dem_2024,
+  corr_vax_rate_v_case_rate,
+  corr_vax_rate_v_death_rate
 )
 
 corr_df <- do.call(rbind, lapply(correlations, as.data.frame))
@@ -325,3 +344,27 @@ corr_plot_vax_rates_v_pa_2024 <- plot_correlation(
   y_label = "Fully vaccinated rate"
 )
 ggsave(file.path(correlations_dir, "corr_plot_vax_rates_v_pa_2024.png"), plot = corr_plot_vax_rates_v_pa_2024)
+
+# Plot vax rates vs. case rates
+corr_plot_vax_rates_v_case_rate <- plot_correlation(
+  dataset = covid_v_er_2024,
+  cx = "PERC_FULLY",
+  cy = "COVID_CONFIRMED_CASE_RATE",
+  pal = brewer.pal(9, "RdBu"),
+  title = "COVID Fully Vaccinated Rates vs. Case Rates",
+  x_label = "Fully vaccinated rate",
+  y_label = "Case rate"
+)
+ggsave(file.path(correlations_dir, "corr_plot_vax_rates_v_case_rate.png"), plot = corr_plot_vax_rates_v_case_rate)
+
+# Plot vax rates vs. death rates
+corr_plot_vax_rates_v_death_rate <- plot_correlation(
+  dataset = covid_v_er_2024,
+  cx = "PERC_FULLY",
+  cy = "COVID_DEATH_RATE",
+  pal = brewer.pal(9, "RdBu"),
+  title = "COVID Fully Vaccinated Rates vs. Death Rates",
+  x_label = "Fully vaccinated rate",
+  y_label = "Death rate"
+)
+ggsave(file.path(correlations_dir, "corr_plot_vax_rates_v_death_rate.png"), plot = corr_plot_vax_rates_v_death_rate)
