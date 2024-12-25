@@ -1,0 +1,12 @@
+
+	Moran I test under randomisation
+
+data:  car_residuals  
+weights: knn_6_ny_weights    
+
+Moran I statistic standard deviate = -3.9418, p-value = 1
+alternative hypothesis: greater
+sample estimates:
+Moran I statistic       Expectation          Variance 
+     -0.163655118      -0.005681818       0.001606158 
+

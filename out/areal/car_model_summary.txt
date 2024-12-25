@@ -1,0 +1,23 @@
+
+Call: spautolm(formula = scale(COVID_CASE_RATE) ~ democrat_two_party_frac +     PERC_FULLY, data = covid_v_er_2020, listw = knn_6_ny_weights, 
+    family = "CAR", zero.policy = TRUE)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-7.133933 -0.876313 -0.013549  0.984288  7.732101 
+
+Coefficients: 
+                          Estimate Std. Error z value  Pr(>|z|)
+(Intercept)             1.5875e+01 4.1384e-03  3836.0 < 2.2e-16
+democrat_two_party_frac 9.1847e+00 9.3206e-04  9854.2 < 2.2e-16
+PERC_FULLY              1.2666e+01 1.2654e-03 10009.6 < 2.2e-16
+
+Lambda: 0.99929 LR test value: 2128.7 p-value: < 2.22e-16 
+Numerical Hessian standard error of lambda: NaN 
+
+Log likelihood: 845.8567 
+ML residual variance (sigma squared): 3.402e-06, (sigma: 0.0018444)
+Number of observations: 177 
+Number of parameters estimated: 5 
+AIC: -1681.7
+

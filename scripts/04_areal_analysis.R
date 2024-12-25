@@ -452,3 +452,23 @@ writeLines(summary_output, con = file.path(areal_dir, "sar_model_summary.txt"))
 # Save Moran's test results (optional, for diagnostics)
 moran_output <- capture.output(sar_lag_error_moran_residuals)
 writeLines(moran_output, con = file.path(areal_dir, "sar_model_moran_test.txt"))
+
+# CAR model
+car_case_rate <- spautolm(
+  formula = scale(COVID_CASE_RATE) ~ democrat_two_party_frac + PERC_FULLY,
+  data = covid_v_er_2020,
+  listw = knn_6_ny_weights,
+  zero.policy = TRUE,
+  family = "CAR"
+)
+car_residuals <- residuals(car_case_rate)
+car_moran_residuals <- moran.test(car_residuals, listw = knn_6_ny_weights)
+
+# Capture and save the summary output
+summary_output_car <- capture.output(summary(car_case_rate))
+writeLines(summary_output_car, con = file.path(areal_dir, "car_model_summary.txt"))
+
+# Save Moran's test results (optional, for diagnostics)
+moran_output_car <- capture.output(car_moran_residuals)
+writeLines(moran_output_car,
+           con = file.path(areal_dir, "car_model_moran_test.txt"))
