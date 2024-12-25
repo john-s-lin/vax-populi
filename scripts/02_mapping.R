@@ -98,7 +98,7 @@ electoral_map_2020 <- generate_leaflet_map(
   dataset = covid_v_er_2020,
   column_name = "republican_two_party_frac",
   palette = pal_pol_scale_2020,
-  title = "Poltical Voting Scale 2020 (Democrat vs. Republican)"
+  title = "Political Voting Scale 2020 (Democrat vs. Republican)"
 )
 save_leaflet_map(electoral_map_2020,
                  filename = file.path(output_dir, "electoral_map_2020_leaflet.png"))
@@ -113,7 +113,7 @@ electoral_map_2024 <- generate_leaflet_map(
   dataset = covid_v_er_2024,
   column_name = "republican_two_party_frac",
   palette = pal_pol_scale_2024,
-  title = "Poltical Voting Scale 2024 (Democrat vs. Republican)"
+  title = "Political Voting Scale 2024 (Democrat vs. Republican)"
 )
 save_leaflet_map(electoral_map_2024,
                  filename = file.path(output_dir, "electoral_map_2024_leaflet.png"))
@@ -174,7 +174,7 @@ electoral_map_2020_gg <- generate_ggplot_map(
   dataset = covid_v_er_2020,
   column_name = "democrat_two_party_frac",
   pal = brewer.pal(n = 11, "RdYlBu"),
-  title = "Poltical Voting Scale 2020 (Democrat vs. Republican)",
+  title = "Political Voting Scale 2020 (Democrat vs. Republican)",
   with_legend = FALSE
 )
 ggsave(file.path(output_dir, "electoral_map_2020_gg.png"), plot = electoral_map_2020_gg)
@@ -184,7 +184,7 @@ electoral_map_2024_gg <- generate_ggplot_map(
   dataset = covid_v_er_2024,
   column_name = "democrat_two_party_frac",
   pal = brewer.pal(n = 11, "RdYlBu"),
-  title = "Poltical Voting Scale 2024 (Democrat vs. Republican)",
+  title = "Political Voting Scale 2024 (Democrat vs. Republican)",
   with_legend = FALSE
 )
 ggsave(file.path(output_dir, "electoral_map_2024_gg.png"), plot = electoral_map_2024_gg)
