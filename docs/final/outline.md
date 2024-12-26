@@ -70,5 +70,42 @@
 
 ## Visualizing distributions
 
+- Histograms showing distributions of
+    - Case rates per district
+    - Death rates per district
+    - Vaccination rates per district
+    - Proportion democratic voters 2020/2024
+    - Proportion republican voters 2020/2024
+
+## Visualizing distributions on a map
+
+- Mapping the distributions we can also at a glance see the density of the proportion of the population of each targeted feature
+- This is especially important for electoral districts, since the overlaid polygons should accumulate results from separate electoral divisions
+
+## Correlation statistics
+
+- Correlations between COVID metrics and election results were plotted
+    - COVID case rate vs. voting fraction (2020, 2024)
+    - COVID death rate vs. voting fraction (2020, 2024)
+    - COVID vax rate vs. voting fraction (2020, 2024)
+    - COVID vax rate vs case rates
+    - COVID vax rate vs death rates
+
+## Areal statistics
+
+- Moran's I calculated
+    - 6NN
+    - Queen
+    - IDW
+- Best neighbor metrics used for subsequent analysis
+- Correlograms are generated to view autocorrelative effects across neighboring regions
+- Getis-Ord Gi Star is calculated
+    - What does Getis-Ord do?
+- SAR model with spatial lag-errors on case rates vs vax and political alignment
+    - What does the SAR model do?
+- CAR model with case rates vs vax and political alignment.
+    - What does the CAR model do?
+
+# Results
 
 # Conclusion
